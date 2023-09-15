@@ -1,6 +1,8 @@
-const express = require("express")
-const router = express.Router()
-const products = require('./products')
+const express = require("express");
+const router = express.Router();
+const products = require('./products');
+const userData = require('./userData');
+const user = userData;
 
 router.get("/api/products", (req,res)=>{
     const limit = req.query.limit;
@@ -83,31 +85,22 @@ router.delete("/api/products/delete/:pid", (req,res)=>{
 })
 
 
+
 router.get("/", (req,res)=>{
+  
+    const userRole = user.role;
+    const isAdmin = userRole === "admin"
+
     
-    usuarios = [
-
-        {
-            name: "Administrador",
-            role: "admin"
-        },
-
-        {
-            name: "Usuario",
-            role: "user"
-        }
-    ]
-
-    const userRole = "user";
-    const userObject = usuarios.find(user => user.role === userRole);
-    
-    res.render('index.handlebars', {
+    res.render('index.handlebars', { 
+        userId: user.id,
         user: {
-            name: userObject.name,
+            name: user.name,
             role: userRole
         }, 
-        isAdmin: userRole === "admin",      
-        products : products
+        isAdmin: isAdmin,      
+        products : products,
+       
     })
 })
 

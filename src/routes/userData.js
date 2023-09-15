@@ -1,17 +1,8 @@
-
-const users = {
-    
-        id: 1,
-        name: "Usuario 1",
-        role: "user",
-       
-    
-    
-        id: 2,
-        name: "Admin",
-        role: "admin"
- 
+// userData.js
+const user = {
+    id: 1,
+    name: "Usuario", // Nombre del usuario
+    role: "user"    // Rol del usuario ("user" o "admin")
 };
-module.exports = {
-    userId: 1
-}
+
+module.exports = user;

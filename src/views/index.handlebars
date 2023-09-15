@@ -157,73 +157,55 @@
     
     <h1>Añadir productos al carrito</h1>
 
-   <form method="post" action="/api/cart/add" onsubmit="event.preventDefault(); 
-    const selectProdId = this.querySelector('#producto').value;
-    const userId = '{{user.id}}';
-    this.action = `/api/cart/add/${userId}/${selectProdId}`;">
-
-     <input type="hidden" name="_method" value="POST">
-     <label for="producto">Selecciona un producto para agregar:</label>
+   <form method="post" action="/api/cart/add/:cartId/:productId" id="cartForm">
+    <input type="hidden" name="_method" value="POST">
+    <input type="hidden" id="cartId" value="{{cartId}}">
+    <label for="producto">Selecciona un producto para agregar:</label>
     <select id="producto" name="pid">
         {{#each products}}
-             <option value="{{this.id}}">{{this.id}} - {{this.name}}</option>
+            <option value="{{this.id}}">{{this.id}} - {{this.name}}</option>
         {{/each}}
     </select>
-
     <button id="addCartBtn">Agregar al carrito</button>
     </form>
-
-   <script src="https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/umd/uuidv4.min.js"></script>
     
     <script>
 
-        function generateCartId(){
-            return uuidv4();
-        }
+    document.addEventListener('DOMContentLoaded', function() {   
+    const cartId = document.getElementById('cartId').value;
+    const cartForm = document.querySelector('#cartForm');
+    const productSelect =  document.querySelector('#producto');
 
-    fetch('/api/userData')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Error al cargar la información del usuario');
-        }
-        return response.json();
-    })
+        cartForm.addEventListener('submit', async function(e) {
+         e.preventDefault();
+        
+        const selectProdId = productSelect.value;
+        const cartId = cartId;
+        console.log('cart ID', cartId)
+         try {
+            const response = await fetch(`/api/cart/add/${cartId}/${selectProdId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ cartId, productId: selectProdId })
+            });
 
-    .then((userData) => {
-      
-        const userId = userData.userId;
-        const addCartBtn = document.getElementById('addCartBtn');
-
-        addCartBtn.addEventListener('click', ()=>{
-            const prodSelectedId = document.getElementById('producto').value;
-            
-
-        fetch(`/api/cart/add/${userId}/${prodSelectedId}`, {
-         method: 'POST',
-         headers: {
-        'Content-Type': 'application/json'
-    },
-            body: JSON.stringify({cartId: userId})
-        })
-        .then(response => {
-            if (!response.ok){
+             if (!response.ok) {
                 throw new Error('Error al agregar el producto al carrito CLIENT');
             }
-            alert('producto agregado existosamente');
-        }) 
-        .catch(error =>{
-    console.error('Error al agregar el producto a carrito', error)   
-      
-
+            alert('Producto agregado exitosamente');
+        } catch(error){
+            console.error('Error al agregar el producto a carrito', error);
+        };
     });
-    });
-    });
-    </script>
+    })  
+</script>
 
     {{#if products.length}}
         {{#each products}}
             <div id="listadoProd">
-                 <p>Id: {{this.pid}}</p>
+                 <p>Id: {{this.id}}</p>
                  <p>Producto: {{this.name}}</p>
                  <p>Precio: {{this.price}}</p>
                  <p>Descripción: {{this.description}}</p>

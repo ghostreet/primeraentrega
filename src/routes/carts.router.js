@@ -1,14 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const fs = require("fs/promises");
-const path = require("path");
 const userData = require("./userData");
 
+let userCartIds = {};
 
-const cartIdsFilePath = path.join(__dirname, "./routes/cartIds.json");
-
-// Ruta para obtener los datos del usuario desde userData.js
-router.get("/api/userData", async (req, res) => {
+// Ruta para obtener los datos del usuario
+router.get("/userData", async (req, res) => {
     try {
         // userData contiene los datos exportados desde userData.js
         res.json(userData);
@@ -16,77 +14,43 @@ router.get("/api/userData", async (req, res) => {
         res.status(500).json({ error: "Error al cargar la información del usuario" });
     }
 });
-async function loadCartIds() {
-    try {
-        const data = await fs.readFile(cartIdsFilePath, "utf-8");
-        return JSON.parse(data);
-    } catch (error) {
-        // Si el archivo no existe o hay un error al leerlo, retorna un objeto vacío
-        return {};
-    }
-}
-async function saveCartIds(cartIds) {
-    try {
-        await fs.writeFile(cartIdsFilePath, JSON.stringify(cartIds, null, 2), "utf-8");
-    } catch (error) {
-        console.error("Error al guardar las cartIds:", error);
-    }
-}
 
-
-// Estructura para mantener los carritos en memoria
-let userCartIds = {};
-
-// Ruta para obtener el carrito de un usuario o renderizar la vista
-router.get("/api/cart/:userId", async (req, res) => {
-    const userId = req.params.userId;
-    console.log(userId)
+// Ruta para obtener el carrito de un usuario
+router.get("/api/cart/:cartId", (req, res) => {
+    const cartId = req.params.cartId;
 
     try {
         // Verifica si el usuario ya tiene una cartId
-        let cartId = userCartIds[userId];
+        const cartProducts = userCartIds[cartId] || [];
+
+        res.json({cartId, products: cartProducts});
 
         // Si el usuario no tiene una cartId, genera una nueva
-        if (!cartId) {
-            // Asigna la cartId al usuario y guárdala en el archivo
-            const cartIds = await loadCartIds();
-            cartId = cartIds[userId];
-
-            if (!cartId) {
-                cartId = generateCartId();
-                cartIds[userId] = cartId;
-                await saveCartIds(cartIds);
+        if (!userCartIds[cartId]) {
+            const newCarId = generateCartId();
+            userCartIds[newCarId] = [];
         }
-        userCartIds[userId] = cartId;
-    }
-
-        res.render('index.handlebars', {
-            user: {
-               
-                name: "Nombre del usuario",
-                role: "user"
-            },
-            isAdmin: false, // Cambiar a false si es un usuario normal
-            products: []
-        });
     } catch (error) {
         res.status(500).json({ error: "Error al obtener los datos del usuario" });
     }
 });
 
 // Ruta para agregar un producto al carrito de un usuario
-router.post("/api/cart/add/:userId/:productId", (req, res) => {
-    const userId = req.params.userId;
+router.post("/api/cart/add/:cartId/:productId", (req, res) => {
+    const cartId = parseInt(req.params.cartId);
     const productId = parseInt(req.params.productId);
 
     try {
         // Verifica si el carrito ya existe para este usuario, si no, crea uno nuevo
-        if (!userCarts[userId]) {
-            userCarts[userId] = [];
+        if (!userCartIds[cartId]){
+            const newCartId = generateCartId();
+            userCartIds[newCartId] = [];
         }
 
-        // Busca si el producto ya está en el carrito del usuario
-        const prodInCart = userCarts[userId].find((item) => item.id === productId);
+        const userCart = userCartIds[cartId]
+
+        //busca si el producto ya está en el carrito del usuario
+        const prodInCart = userCart.find((item) => item.id === productId);
 
         if (prodInCart) {
             prodInCart.quantity++;
@@ -95,13 +59,19 @@ router.post("/api/cart/add/:userId/:productId", (req, res) => {
                 id: productId,
                 quantity: 1
             };
-            userCarts[userId].push(prodAdd);
+            userCart.push(prodAdd);
         }
 
-        res.json({ message: 'Producto agregado correctamente' });
+        res.render('index.handlebars, { cartId }');
+        res.json({ message: 'Producto agregado correctamente', cartId });
     } catch (error) {
         res.status(500).json({ error: "Error al agregar producto al carrito SERVER" });
     }
 });
+
+// Función para generar una cartId (puedes personalizarla según tus necesidades)
+function generateCartId() {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
 
 module.exports = router;
