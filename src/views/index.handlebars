@@ -1,0 +1,242 @@
+<div>
+    <h1>Saludos, {{user.name}}</h1>
+    {{#if isAdmin}}
+ <form method="get" action="/api/products">
+    <button type="submit">Mostrar productos</button>
+ </form>
+  
+ <h1>Ingrese nuevo producto</h1>
+    <form action="/api/products" method="post">
+        <label for="idProd">Id del producto</label>
+        <input type="number" id="idProd" name="id" required>
+        <label for="nombreProd">Nombre del producto</label>
+        <input type="text" id="nombreProd" name="name" required>
+        <label for="precioProd">Precio del producto</label>
+        <input type="number" id="precioProd" name="price" required>
+        <label for="descProd">Descripción del producto</label>
+        <input type="text" id="descProd" name="description" required>
+        <label for="codeProd">Codigo del producto</label>
+        <input type="number" id="codeProd" name="code" required>
+        <label for="stockProd">Stock del producto</label>
+        <input type="number" id="stockProd" name="stock" required>
+        <label for="catProd">Categoria del producto</label>
+        <input type="text" id="catProd" name="category" required>
+
+        <button type="submit">Agregar producto</button>
+    </form>
+
+   <h1>Eliminar productos por Id</h1>
+<form method="POST" action="/api/products/delete/" id="deleteProd" onsubmit="event.preventDefault(); 
+  const selectProdId = this.querySelector('#producto').value; 
+  this.action = `/api/products/delete/${selectProdId}`; 
+  this.querySelector('[name=_method]').value = 'DELETE'; 
+  this.submit();">
+  <input type="hidden" name="_method" value="DELETE">
+  <label for="producto">Selecciona un producto para eliminar:</label>
+  <select id="producto" name="pid">
+    {{#each products}}
+    <option value="{{this.id}}">{{this.id}} - {{this.name}}</option>
+    {{/each}}
+  </select>
+  <button type="submit" onclick="deleteProduct()">Eliminar producto</button>
+</form>
+
+<script>
+    function deleteProduct() {
+        const selectProdId = document.getElementById("producto").value;
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+        fetch(`/api/products/delete/${selectProdId}`, requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al eliminar producto');
+                }
+            
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error al eliminar producto', error);
+            });
+    }
+</script>
+<h1>Buscar productos por ID</h1>
+    <form method="get"  action="/api/products/:pid" onsubmit="event.preventDefault(); 
+        const selectProdId = this.querySelector('#producto').value; 
+        this.action = `/api/products/${selectProdId}`; 
+        this.querySelector('[name=_method]').value = 'GET'; 
+        this.submit();">
+        <input type="hidden" name="_method" value="GET">
+         <label for="producto">Selecciona una ID para ver un producto</label>
+            <select id="producto" name="pid">
+    {{#each products}}
+        <option value="{{this.id}}">{{this.id}} - {{this.name}}</option>
+    {{/each}}
+            </select>
+        <button type="submit">Ver producto</button>
+    </form>
+
+    <h1>Actualizar productos</h1>
+    <form method="post" action="/api/products/:pid" onsubmit="event.preventDefault(); 
+     const selectProdId = this.querySelector('#producto').value; 
+     this.action = `/api/products/${selectProdId}`;">
+
+     <input type="hidden" name="_method" value="PUT">
+     <label for="producto">Selecciona un producto para actualizar:</label>
+    <select id="producto" name="pid">
+        {{#each products}}
+             <option value="{{this.id}}">{{this.id}} - {{this.name}}</option>
+        {{/each}}
+    </select>
+
+    <label for="nuevoNombre">Nuevo nombre:</label>
+        <input type="text" id="nuevoNombre" name="nuevoNombre">
+
+    <label for="nuevoPrecio">Nuevo precio:</label>
+        <input type="number" id="nuevoPrecio" name="nuevoPrecio">
+
+    <label for="nuevaDescription">Nueva descripción:</label>
+        <input type="text" id="nuevaDescription" name="nuevaDescription">
+
+    <label for="nuevoCode">Nuevo codigo:</label>
+        <input type="number" id="nuevoCode" name="nuevoCode">
+
+    <label for="nuevoStock">Nuevo precio:</label>
+        <input type="number" id="nuevoStock" name="nuevoStock">
+
+    <label for="nuevaCategory">Nueva categoria:</label>
+        <input type="text" id="nuevaCategory" name="nuevaCategory">
+    
+    <button type="submit" onclick="updateProduct()">Actualizar producto</button>
+    </form>
+
+    <script>
+        function updateProduct() {
+            const selectProdId = document.getElementById("producto").value;
+            const nuevoNombre = document.getElementById("nuevoNombre").value;
+            const nuevoPrecio = document.getElementById("nuevoPrecio").value;
+            const nuevaDesc = document.getElementById("nuevaDescription").value;
+            const nuevoCode = document.getElementById("nuevoCode").value;
+            const nuevoStock = document.getElementById("nuevoStock").value;
+            const nuevaCat = document.getElementById("nuevaCategory").value;
+
+        const updateData = {
+        name: nuevoNombre,
+        price: nuevoPrecio,
+        description: nuevaDesc,
+        code: nuevoCode,
+        stock: nuevoStock,
+        category: nuevaCat     
+        };
+
+        const requestOpt = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        };
+
+        fetch(`/api/products/${selectProdId}`, requestOpt)
+            .then(response => {
+                if (!response.ok){
+                    throw new Error('Error al actualizar el producto')
+                }
+                window.location.reload();
+            })
+            .catch(error=>{
+                console.error('Error al actualizar el producto')
+            })
+        }
+    </script>
+    
+{{else}}
+    
+    <h1>Añadir productos al carrito</h1>
+
+   <form method="post" action="/api/cart/add" onsubmit="event.preventDefault(); 
+    const selectProdId = this.querySelector('#producto').value;
+    const userId = '{{user.id}}';
+    this.action = `/api/cart/add/${userId}/${selectProdId}`;">
+
+     <input type="hidden" name="_method" value="POST">
+     <label for="producto">Selecciona un producto para agregar:</label>
+    <select id="producto" name="pid">
+        {{#each products}}
+             <option value="{{this.id}}">{{this.id}} - {{this.name}}</option>
+        {{/each}}
+    </select>
+
+    <button id="addCartBtn">Agregar al carrito</button>
+    </form>
+
+   <script src="https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/umd/uuidv4.min.js"></script>
+    
+    <script>
+
+        function generateCartId(){
+            return uuidv4();
+        }
+
+    fetch('/api/userData')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error al cargar la información del usuario');
+        }
+        return response.json();
+    })
+
+    .then((userData) => {
+      
+        const userId = userData.userId;
+        const addCartBtn = document.getElementById('addCartBtn');
+
+        addCartBtn.addEventListener('click', ()=>{
+            const prodSelectedId = document.getElementById('producto').value;
+            
+
+        fetch(`/api/cart/add/${userId}/${prodSelectedId}`, {
+         method: 'POST',
+         headers: {
+        'Content-Type': 'application/json'
+    },
+            body: JSON.stringify({cartId: userId})
+        })
+        .then(response => {
+            if (!response.ok){
+                throw new Error('Error al agregar el producto al carrito CLIENT');
+            }
+            alert('producto agregado existosamente');
+        }) 
+        .catch(error =>{
+    console.error('Error al agregar el producto a carrito', error)   
+      
+
+    });
+    });
+    });
+    </script>
+
+    {{#if products.length}}
+        {{#each products}}
+            <div id="listadoProd">
+                 <p>Id: {{this.pid}}</p>
+                 <p>Producto: {{this.name}}</p>
+                 <p>Precio: {{this.price}}</p>
+                 <p>Descripción: {{this.description}}</p>
+                 <p>Codigo: {{this.code}}</p>
+                 <p>Stock: {{this.stock}}</p>
+                 <p>Categoria: {{this.category}}</p>
+        
+            </div>
+        {{/each}}
+    {{/if}}
+{{/if}}
+
+
+
+</div>
+
