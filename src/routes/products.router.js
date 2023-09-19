@@ -82,6 +82,9 @@ router.delete("/api/products/delete/:pid", (req,res)=>{
     products.splice(index, 1);
     console.log('producto eliminado')
     res.json({message: 'Producto eliminado exitosamente'})
+    res.render('index.handlebars',{
+        products:products
+    })
 })
 
 

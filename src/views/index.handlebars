@@ -1,4 +1,5 @@
 <div>
+    
     <h1>Saludos, {{user.name}}</h1>
     {{#if isAdmin}}
  <form method="get" action="/api/products">
@@ -195,16 +196,19 @@
         const selectProdId = productSelect.value;
         
          try {
+            
             const response = await fetch(`/api/cart/add/${cartId}/${selectProdId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ cartId, pid: selectProdId })
+               
             });
 
              if (!response.ok) {
-                throw new Error('Error al agregar el producto al carrito CLIENT');
+                const errorMessage = await response.text();
+                console.error('erro al agregar el producto al carrito Lado Cliente', errorMessage)
+                alert('Error al agregar el producto al carrito CLIENT'+ errorMessage);
             }
             alert('Producto agregado exitosamente');
         } catch(error){
@@ -217,6 +221,7 @@
     {{#if products.length}}
         {{#each products}}
             <div id="listadoProd">
+                
                  <p>Id: {{this.id}}</p>
                  <p>Producto: {{this.name}}</p>
                  <p>Precio: {{this.price}}</p>
