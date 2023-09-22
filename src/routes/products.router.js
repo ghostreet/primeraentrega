@@ -89,23 +89,7 @@ router.delete("/api/products/delete/:pid", (req,res)=>{
 
 
 
-router.get("/", (req,res)=>{
-  
-    const userRole = user.role;
-    const isAdmin = userRole === "admin"
 
-    
-    res.render('index.handlebars', { 
-        userId: user.id,
-        user: {
-            name: user.name,
-            role: userRole
-        }, 
-        isAdmin: isAdmin,      
-        products : products,
-       
-    })
-})
 
 
 module.exports = router

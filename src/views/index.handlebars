@@ -42,28 +42,7 @@
   <button type="submit" onclick="deleteProduct()">Eliminar producto</button>
 </form>
 
-<script>
-    function deleteProduct() {
-        const selectProdId = document.getElementById("producto").value;
-        const requestOptions = {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        };
-        fetch(`/api/products/delete/${selectProdId}`, requestOptions)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error al eliminar producto');
-                }
-            
-                window.location.reload();
-            })
-            .catch(error => {
-                console.error('Error al eliminar producto', error);
-            });
-    }
-</script>
+
 <h1>Buscar productos por ID</h1>
     <form method="get"  action="/api/products/:pid" onsubmit="event.preventDefault(); 
         const selectProdId = this.querySelector('#producto').value; 
@@ -114,45 +93,7 @@
     <button type="submit" onclick="updateProduct()">Actualizar producto</button>
     </form>
 
-    <script>
-        function updateProduct() {
-            const selectProdId = document.getElementById("producto").value;
-            const nuevoNombre = document.getElementById("nuevoNombre").value;
-            const nuevoPrecio = document.getElementById("nuevoPrecio").value;
-            const nuevaDesc = document.getElementById("nuevaDescription").value;
-            const nuevoCode = document.getElementById("nuevoCode").value;
-            const nuevoStock = document.getElementById("nuevoStock").value;
-            const nuevaCat = document.getElementById("nuevaCategory").value;
-
-        const updateData = {
-        name: nuevoNombre,
-        price: nuevoPrecio,
-        description: nuevaDesc,
-        code: nuevoCode,
-        stock: nuevoStock,
-        category: nuevaCat     
-        };
-
-        const requestOpt = {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updateData)
-        };
-
-        fetch(`/api/products/${selectProdId}`, requestOpt)
-            .then(response => {
-                if (!response.ok){
-                    throw new Error('Error al actualizar el producto')
-                }
-                window.location.reload();
-            })
-            .catch(error=>{
-                console.error('Error al actualizar el producto')
-            })
-        }
-    </script>
+    
     
 {{else}}
     
@@ -170,72 +111,32 @@
     <button id="addCartBtn">Agregar al carrito</button>
     </form>
     
-    <script>
-      
-
-    document.addEventListener('DOMContentLoaded', function() { 
-          // Función para generar una cartId
-    function generateCartId() {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-}
-        let cartId = localStorage.getItem('cartId')
-
-        if (!cartId) {
-            cartId = generateCartId();
-            localStorage.setItem('cartId', cartId) 
-        }
-
-        
-
-    const cartForm = document.querySelector('#cartForm');
-    const productSelect =  document.querySelector('#producto');
-
-        cartForm.addEventListener('submit', async function(e) {
-         e.preventDefault();
-        
-        const selectProdId = productSelect.value;
-        
-         try {
-            
-            const response = await fetch(`/api/cart/add/${cartId}/${selectProdId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-               
-            });
-
-             if (!response.ok) {
-                const errorMessage = await response.text();
-                console.error('erro al agregar el producto al carrito Lado Cliente', errorMessage)
-                alert('Error al agregar el producto al carrito CLIENT'+ errorMessage);
-            }
-            alert('Producto agregado exitosamente');
-        } catch(error){
-            console.error('Error al agregar el producto a carrito', error);
-        };
-    });
-    })  
-</script>
-
     {{#if products.length}}
-        {{#each products}}
+       
             <div id="listadoProd">
-                
-                 <p>Id: {{this.id}}</p>
-                 <p>Producto: {{this.name}}</p>
-                 <p>Precio: {{this.price}}</p>
-                 <p>Descripción: {{this.description}}</p>
-                 <p>Codigo: {{this.code}}</p>
-                 <p>Stock: {{this.stock}}</p>
-                 <p>Categoria: {{this.category}}</p>
+                <ul> 
+                     {{#each products}}
+                    <li> 
+                        <p>Id: {{this.id}}</p>
+                        <p>Producto: {{this.name}}</p>
+                        <p>Precio: {{this.price}}</p>
+                        <p>Descripción: {{this.description}}</p>
+                        <p>Codigo: {{this.code}}</p>
+                        <p>Stock: {{this.stock}}</p>
+                        <p>Categoria: {{this.category}}</p>
+
+                    </li>
+                </ul>
+                 
         
             </div>
         {{/each}}
     {{/if}}
 {{/if}}
 
-
+ <script src="/socket.io/socket.io.js"></script>
+ <script src="/scripts.js"></script>
+ <script src="/websocket.js"></script>
 
 </div>
 
