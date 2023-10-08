@@ -1,8 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
+/*document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded se ha disparado');
 const socket = io();
 
-socket.on('productos', products =>{
+/*socket.on('productos', products =>{
 const productList = document.querySelector('#listadoProd ul');
 
 
@@ -31,7 +31,7 @@ products.forEach(product =>{
 
 console.log('productos recibidos correctamente')
 
-})
+})*/
 
 
 

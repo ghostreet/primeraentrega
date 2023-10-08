@@ -9,12 +9,15 @@ const http = require('http')
 const socketIo = require('socket.io')
 const path = require('path')
 const {Server} = require('socket.io');
-const products = require("./routes/products");
+const productModel = require('./models/product.model').productModel;
+const { error } = require("console");
+const { default: mongoose } = require("mongoose")
 
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
 
 app.engine("handlebars", handlebars.engine());
 app.set("views", __dirname+'/views');
@@ -37,8 +40,6 @@ io.on('connection', (socket)=>{
 })
 
 
-
-
 app.use("/", cartsRouter);
 app.use("/", prodRouter);
 
@@ -48,21 +49,39 @@ app.use((err, req, res, next) => {
     res.status(500).send('Hubo un error en el servidor');
   });
 
-  app.get("/", (req, res) => {
-    const userRole = user.role;
-    const isAdmin = userRole === "admin";
-  
-    res.render('index.handlebars', {
-      userId: user.id,
-      user: {
-        name: user.name,
-        role: userRole
-      },
-      isAdmin: isAdmin,
-    });
+
+  app.get("/", async(req, res) => {
+    try{
+      const userRole = user.role;
+      const isAdmin = userRole === "admin";
+
+      const products = await productModel.find();
+
+      res.render('index.handlebars', {
+        userId: user.id,
+        user: {
+          name: user.name,
+          role: userRole
+        },
+        isAdmin: isAdmin,
+        products: products
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Hubo un error en el servidor')
+    }
   });
 
   const PORT = process.env.PORT || 8080;
   server.listen(PORT,()=>{ 
    console.log(`Servidor ejecutandose en el puerto: ${PORT}`);
   });
+
+  mongoose.connect('mongodb+srv://userTest:SPyccTEAFDxZMYdp@cluster0.mfugdwf.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp')
+  .then(()=>{
+    console.log('conectado a la base de datos')
+  })
+  .catch(error=> {
+    console.log('error al intentar conectar la base de datos', error)
+
+  })

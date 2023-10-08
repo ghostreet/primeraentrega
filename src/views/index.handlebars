@@ -7,7 +7,7 @@
  </form>
   
  <h1>Ingrese nuevo producto</h1>
-    <form action="/api/products" method="post">
+    <form action="/api/add/products" method="post">
         <label for="idProd">Id del producto</label>
         <input type="number" id="idProd" name="id" required>
         <label for="nombreProd">Nombre del producto</label>
@@ -36,7 +36,7 @@
   <label for="producto">Selecciona un producto para eliminar:</label>
   <select id="producto" name="pid">
     {{#each products}}
-    <option value="{{this.id}}">{{this.id}} - {{this.name}}</option>
+    <option value="{{@root._id}}">{{@root._id}} - {{@root.name}}</option>
     {{/each}}
   </select>
   <button type="submit" onclick="deleteProduct()">Eliminar producto</button>
@@ -53,7 +53,7 @@
          <label for="producto">Selecciona una ID para ver un producto</label>
             <select id="producto" name="pid">
     {{#each products}}
-        <option value="{{this.id}}">{{this.id}} - {{this.name}}</option>
+        <option value="{{@root._id}}">{{@root._id}} - {{@root.name}}</option>
     {{/each}}
             </select>
         <button type="submit">Ver producto</button>
@@ -68,7 +68,7 @@
      <label for="producto">Selecciona un producto para actualizar:</label>
     <select id="producto" name="pid">
         {{#each products}}
-             <option value="{{this.id}}">{{this.id}} - {{this.name}}</option>
+             <option value="{{@root._id}}">{{@root._id}} - {{@root.name}}</option>
         {{/each}}
     </select>
 
@@ -105,7 +105,7 @@
     <label for="producto">Selecciona un producto para agregar:</label>
     <select id="producto" name="pid">
         {{#each products}}
-            <option value="{{this.id}}">{{this.id}} - {{this.name}}</option>
+            <option value="{{@root._id}}">{{@root._id}} - {{@root.name}}</option>
         {{/each}}
     </select>
     <button id="addCartBtn">Agregar al carrito</button>
@@ -117,13 +117,13 @@
                 <ul> 
                      {{#each products}}
                     <li> 
-                        <p>Id: {{this.id}}</p>
-                        <p>Producto: {{this.name}}</p>
-                        <p>Precio: {{this.price}}</p>
-                        <p>Descripción: {{this.description}}</p>
-                        <p>Codigo: {{this.code}}</p>
-                        <p>Stock: {{this.stock}}</p>
-                        <p>Categoria: {{this.category}}</p>
+                        <p>Id: {{@root._id}}</p>
+                        <p>Producto: {{@root.name}}</p>
+                        <p>Precio: {{@root.price}}</p>
+                        <p>Descripción: {{@root.description}}</p>
+                        <p>Codigo: {{@root.code}}</p>
+                        <p>Stock: {{@root.stock}}</p>
+                        <p>Categoria: {{@root.category}}</p>
 
                     </li>
                 </ul>
